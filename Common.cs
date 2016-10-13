@@ -11,7 +11,7 @@ namespace MostrarTempo
         public static string APIRequest(string lat, string lng)
         {
             StringBuilder sb = new StringBuilder(API_LINK);
-            sb.AppendFormat("?lat={0}&lon={1}&APPID={2}&units=metric", lat, lng, API_KEY);
+            sb.AppendFormat("?lat={0}&lon={1}&APPID={2}", lat, lng, API_KEY);
             return sb.ToString();
 
 

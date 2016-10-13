@@ -7,6 +7,7 @@ using Android.OS;
 using Android.Runtime;
 using Newtonsoft.Json;
 using Square.Picasso;
+using System.Threading.Tasks;
 
 namespace MostrarTempo
 {
@@ -15,28 +16,38 @@ namespace MostrarTempo
     {
         TextView txtCity, txtLastUpdate, txtDescription, txtHumidaty, txtTime, txtCelsius;
 
-        private ImageView imgView;
-        private LocationManager locationManager;
-        private string provider;
-        private static double lat;
-        private OpenWeatherMap openWeatherMap = new OpenWeatherMap();
+        ImageView imgView;
+        LocationManager locationManager;
+        string provider;
+        static double lat, lng;
+        OpenWeatherMap openWeatherMap = new OpenWeatherMap();
 
-        static double lng;
         protected override void OnCreate(Bundle bundle)
         {
             base.OnCreate(bundle);
 
             // Set our view from the "main" layout resource
-            // SetContentView (Resource.Layout.Main);
+             SetContentView (Resource.Layout.Main);
+
             locationManager = (LocationManager)GetSystemService(Context.LocationService);
             provider = locationManager.GetBestProvider(new Criteria(), false);
 
             Location location = locationManager.GetLastKnownLocation(provider);
             if (location == null)
                 System.Diagnostics.Debug.WriteLine("No location");
+            else
+            {
+                lat = Math.Round(location.Latitude, 6);
+                lng = Math.Round(location.Longitude, 6);
 
-    
+                new GetWeather(this, openWeatherMap).Execute(Common.APIRequest(lat.ToString(), lng.ToString()));
+            }
+
+
+
         }
+
+       
         protected override void OnResume()
         {
             base.OnResume();
@@ -53,8 +64,8 @@ namespace MostrarTempo
 
         public void OnLocationChanged(Location location)
         {
-            lat = Math.Round(location.Latitude, 4);
-            lng = Math.Round(location.Longitude, 4);
+            lat = Math.Round(location.Latitude, 6);
+            lng = Math.Round(location.Longitude, 6);
 
             new GetWeather(this, openWeatherMap).Execute(Common.APIRequest(lat.ToString(), lng.ToString()));
         }
@@ -78,7 +89,7 @@ namespace MostrarTempo
         {
             private ProgressDialog pd = new ProgressDialog(Application.Context);
             private MainActivity activity;
-            private OpenWeatherMap openWeatherMap;
+            OpenWeatherMap openWeatherMap;
 
 
             public GetWeather(MainActivity activity, OpenWeatherMap openWeatherMap)
@@ -101,57 +112,65 @@ namespace MostrarTempo
 
                 Helper http = new Helper();
 
-                //urlString =  Common.Common.APIRequest(lat.ToString(), lng.ToString()
-                stream = http.GetHTTPData(urlString);
+
+                dynamic results = http.getDataFromService(urlString).ConfigureAwait(false);                          
+                    
+                   
+                
                 return stream;
+
+
+               
 
             }
 
             protected override void OnPostExecute(string result)
             {
                 base.OnPostExecute(result);
-                if (result.Contains("Error: Not found city"))
+
+               if (result.Contains("Error: Not found city"))
                 {
                     pd.Dismiss();
                     return;
                 }
+
                 openWeatherMap = JsonConvert.DeserializeObject<OpenWeatherMap>(result);
                 pd.Dismiss();
 
 
                 if (openWeatherMap != null)
                 {
-                    
-                }
 
-                //Control
-                activity.txtCity = activity.FindViewById<TextView>(Resource.Id.txtCity);
-                activity.txtLastUpdate = activity.FindViewById<TextView>(Resource.Id.txtLastUpdate);
-                activity.txtDescription = activity.FindViewById<TextView>(Resource.Id.txtDescription);
-                activity.txtHumidaty = activity.FindViewById<TextView>(Resource.Id.txtHumidity);
-                activity.txtTime = activity.FindViewById<TextView>(Resource.Id.txtTime);
-                activity.txtCelsius = activity.FindViewById<TextView>(Resource.Id.txtCelsius);
+                    //Control
+                    activity.txtCity = activity.FindViewById<TextView>(Resource.Id.txtCity);
+                    activity.txtLastUpdate = activity.FindViewById<TextView>(Resource.Id.txtLastUpdate);
+                    activity.txtDescription = activity.FindViewById<TextView>(Resource.Id.txtDescription);
+                    activity.txtHumidaty = activity.FindViewById<TextView>(Resource.Id.txtHumidity);
+                    activity.txtTime = activity.FindViewById<TextView>(Resource.Id.txtTime);
+                    activity.txtCelsius = activity.FindViewById<TextView>(Resource.Id.txtCelsius);
 
-                activity.imgView = activity.FindViewById<ImageView>(Resource.Id.imageView);
+                    activity.imgView = activity.FindViewById<ImageView>(Resource.Id.imageView);
 
 
-                //Add data
-                activity.txtCity.Text = $"{openWeatherMap.name},{openWeatherMap.sys.country}";
-                activity.txtLastUpdate.Text = $"Last Update: {DateTime.Now.ToString("dd MMMM yyyy HH:mm")}";
-                activity.txtDescription.Text = $"{openWeatherMap.weathers[0].description}";
-                activity.txtHumidaty.Text = $"Humidity: {openWeatherMap.main.humidity} %";
-                activity.txtTime.Text = $"{Common.UnixTimeStampToDateTime(openWeatherMap.sys.sunrise).ToString("HH:mm")}/{Common.UnixTimeStampToDateTime(openWeatherMap.sys.sunrise).ToString("HH:mm")}";
+                    //Add data
+                    activity.txtCity.Text = $"{openWeatherMap.name},{openWeatherMap.sys.country}";
+                    activity.txtLastUpdate.Text = $"Last Update: {DateTime.Now.ToString("dd MMMM yyyy HH:mm")}";
+                    activity.txtDescription.Text = $"{openWeatherMap.weathers[0].description}";
+                    activity.txtHumidaty.Text = $"Humidity: {openWeatherMap.main.humidity} %";
+                    activity.txtTime.Text =
+                        $"{Common.UnixTimeStampToDateTime(openWeatherMap.sys.sunrise).ToString("HH:mm")}/{Common.UnixTimeStampToDateTime(openWeatherMap.sys.sunrise).ToString("HH:mm")}";
 
-                activity.txtCelsius.Text = $"{openWeatherMap.main.temp} °C";
-
-               // openWeatherMap.coord.
+                    activity.txtCelsius.Text = $"{openWeatherMap.main.temp} °C";
 
 
-                if (!String.IsNullOrEmpty(openWeatherMap.weathers[0].icon))
-                {
-                    Picasso.With(activity.ApplicationContext)
-                        .Load(Common.GetImage(openWeatherMap.weathers[0].icon))
-                        .Into(activity.imgView);
+
+
+                    if (!String.IsNullOrEmpty(openWeatherMap.weathers[0].icon))
+                    {
+                        Picasso.With(activity.ApplicationContext)
+                            .Load(Common.GetImage(openWeatherMap.weathers[0].icon))
+                            .Into(activity.imgView);
+                    }
                 }
             }
         }
