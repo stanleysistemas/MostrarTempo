@@ -13,14 +13,20 @@ using Java.Security;
 
 namespace MostrarTempo
 {
-    [Activity(Label = "Mostrar Tempo", MainLauncher = true, Icon = "@drawable/icon")]
+    [Activity(Label = "Mostrar Tempo", MainLauncher = true, Icon = "@drawable/Icon")]
     public class MainActivity : Activity, ILocationListener
     {
-        TextView txtCity, txtLastUpdate, txtDescription, txtHumidaty, txtTime, txtCelsius, txtGps;
-        
+        TextView txtCity, txtLastUpdate, txtDescription, txtHumidaty, txtTime, txtCelsius, txtGps, lblatualiza;
+
+        double temperatura;
+
+        System.Globalization.CultureInfo cult = new System.Globalization.CultureInfo("en-US");
+
         ImageView imgView;
         LocationManager locationManager;
         string provider;
+        string latt;
+        string longg;
         static double lat, lng;
         OpenWeatherMap openWeatherMap = new OpenWeatherMap();
         private ProgressDialog pd1 = new ProgressDialog(Application.Context);
@@ -60,8 +66,16 @@ namespace MostrarTempo
             }
             else
             {
-                lat = Math.Round(location.Latitude, 4);
-                lng = Math.Round(location.Longitude, 4);
+                // lat = Math.Round(location.Latitude, 4);
+                // lng = Math.Round(location.Longitude, 4);
+
+                lat = location.Latitude;
+                lng = location.Longitude;
+
+               // lat = Convert.ToDouble(Convert.ToString(location.Latitude).Replace(",","."));
+
+                // lng = Convert.ToDouble(Convert.ToString(location.Longitude).Replace(",", "."));
+
 
                 new GetWeather(this, openWeatherMap).Execute(Common.APIRequest(lat.ToString(), lng.ToString()));
             }
@@ -93,8 +107,16 @@ namespace MostrarTempo
 
         public void OnLocationChanged(Location location)
         {
-            lat = Math.Round(location.Latitude, 4);
-            lng = Math.Round(location.Longitude, 4);
+            // lat = Math.Round(location.Latitude, 4);
+            //  lng = Math.Round(location.Longitude, 4);
+
+            lat = location.Latitude;
+            lng = location.Longitude;
+
+            //  lat = Convert.ToDouble(Convert.ToString(location.Latitude).Replace(",", "."));
+
+            // lng = Convert.ToDouble(Convert.ToString(location.Longitude).Replace(",", "."));
+
 
             new GetWeather(this, openWeatherMap).Execute(Common.APIRequest(lat.ToString(), lng.ToString()));
 
@@ -152,6 +174,17 @@ namespace MostrarTempo
 
             }
 
+            static double Celcius(double f)
+            {
+                double c = (f - 32);
+
+                c = ( c * 5 );
+
+                c = (c/9);
+                
+                return Math.Round(c,4);
+            }
+
             protected override void OnPostExecute(string result)
             {
                 base.OnPostExecute(result);
@@ -171,24 +204,31 @@ namespace MostrarTempo
 
                     //Control
                     activity.txtCity = activity.FindViewById<TextView>(Resource.Id.txtCity);
+                    activity.lblatualiza = activity.FindViewById<TextView>(Resource.Id.lblatualiza);
                     activity.txtLastUpdate = activity.FindViewById<TextView>(Resource.Id.txtLastUpdate);
                     activity.txtDescription = activity.FindViewById<TextView>(Resource.Id.txtDescription);
                     activity.txtHumidaty = activity.FindViewById<TextView>(Resource.Id.txtHumidity);
                     activity.txtTime = activity.FindViewById<TextView>(Resource.Id.txtTime);
                     activity.txtCelsius = activity.FindViewById<TextView>(Resource.Id.txtCelsius);
 
+                    
+
                     activity.imgView = activity.FindViewById<ImageView>(Resource.Id.imageView);
 
 
                     //Add data
+
+                   
                     activity.txtCity.Text = $"{openWeatherMap.name},{openWeatherMap.sys.country}";
-                    activity.txtLastUpdate.Text = $"Last Update: {DateTime.Now.ToString("dd MMMM yyyy HH:mm")}";
+                    activity.lblatualiza.Text = $"Última Atualização";
+                    activity.txtLastUpdate.Text = $"{DateTime.Now.ToString("dd MMMM yyyy HH:mm")}";
                     activity.txtDescription.Text = $"{openWeatherMap.weather[0].description}";
-                    activity.txtHumidaty.Text = $"Humidity: {openWeatherMap.main.humidity} %";
+                    activity.txtHumidaty.Text = $"Humidade: {openWeatherMap.main.humidity} %";
                     activity.txtTime.Text =
                         $"{Common.UnixTimeStampToDateTime(openWeatherMap.sys.sunrise).ToString("HH:mm")}/{Common.UnixTimeStampToDateTime(openWeatherMap.sys.sunset).ToString("HH:mm")}";
 
-                    activity.txtCelsius.Text = $"{(((openWeatherMap.main.temp)-32)/1.8)} °C";
+
+                    activity.txtCelsius.Text = $"{(openWeatherMap.main.temp) - 273.15} °C";
 
 
 
