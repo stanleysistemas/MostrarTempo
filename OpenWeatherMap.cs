@@ -18,7 +18,7 @@ namespace MostrarTempo
         public double lat { get; set; }
     }
 
-    public class Weathers
+    public class Weather
     {
         public int id { get; set; }
         public string main { get; set; }
@@ -64,7 +64,7 @@ namespace MostrarTempo
     public class OpenWeatherMap
     {
         public Coord coord { get; set; }
-        public List<Weathers> weathers { get; set; }
+        public List<Weather> weather { get; set; }
         public string @base { get; set; }
         public Main main { get; set; }
         public Wind wind { get; set; }

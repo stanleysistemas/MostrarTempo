@@ -84,6 +84,9 @@ namespace MostrarTempo
 			// aapt resource value: 0x7f050006
 			public const int txtTime = 2131034118;
 			
+			// aapt resource value: 0x7f050008
+			public const int txtgps = 2131034120;
+			
 			static Id()
 			{
 				global::Android.Runtime.ResourceIdManager.UpdateIdValues();

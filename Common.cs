@@ -6,7 +6,7 @@ namespace MostrarTempo
     class Common
     {
         public static string API_KEY = "02020f73a50a52af3f212f7fc093c339";
-        public static string API_LINK = "api.openweathermap.org/data/2.5/weather"; //?lat={lat}&lon={lon}
+        public static string API_LINK = "http://api.openweathermap.org/data/2.5/weather"; //?lat={lat}&lon={lon}
 
         public static string APIRequest(string lat, string lng)
         {
