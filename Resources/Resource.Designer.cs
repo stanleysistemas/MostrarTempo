@@ -63,11 +63,17 @@ namespace MostrarTempo
 			// aapt resource value: 0x7f050004
 			public const int imageView = 2131034116;
 			
+			// aapt resource value: 0x7f050009
+			public const int latitude = 2131034121;
+			
 			// aapt resource value: 0x7f050002
 			public const int lblatualiza = 2131034114;
 			
 			// aapt resource value: 0x7f050000
 			public const int linearLayout1 = 2131034112;
+			
+			// aapt resource value: 0x7f05000a
+			public const int longitude = 2131034122;
 			
 			// aapt resource value: 0x7f050008
 			public const int txtCelsius = 2131034120;
@@ -86,9 +92,6 @@ namespace MostrarTempo
 			
 			// aapt resource value: 0x7f050007
 			public const int txtTime = 2131034119;
-			
-			// aapt resource value: 0x7f050009
-			public const int txtgps = 2131034121;
 			
 			static Id()
 			{

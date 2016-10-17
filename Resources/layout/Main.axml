@@ -72,8 +72,16 @@
         android:text=""
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textSize="30dp"
-        android:id="@+id/txtgps"
+        android:textSize="10dp"
+        android:id="@+id/latitude"
+        android:gravity="center"
+        android:textStyle="bold" />
+    <TextView
+        android:text=""
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="10dp"
+        android:id="@+id/longitude"
         android:gravity="center"
         android:textStyle="bold" />
 </LinearLayout>

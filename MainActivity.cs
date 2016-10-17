@@ -16,7 +16,7 @@ namespace MostrarTempo
     [Activity(Label = "Mostrar Tempo", MainLauncher = true, Icon = "@drawable/Icon")]
     public class MainActivity : Activity, ILocationListener
     {
-        TextView txtCity, txtLastUpdate, txtDescription, txtHumidaty, txtTime, txtCelsius, txtGps, lblatualiza;
+        TextView txtCity, txtLastUpdate, txtDescription, txtHumidaty, txtTime, txtCelsius, txtlatitude,txtlongitude, lblatualiza;
 
         double temperatura;
 
@@ -50,35 +50,35 @@ namespace MostrarTempo
             locationManager = (LocationManager)GetSystemService(Context.LocationService);
             provider = locationManager.GetBestProvider(locationCriteria, false);
 
-            //provider = locationManager.GetBestProvider(new Criteria(), false);
+           
             
             Location location = locationManager.GetLastKnownLocation(provider);
-            if (location == null)
-            {
-                System.Diagnostics.Debug.WriteLine("Sem Sinal GPS");
-                //txtGps.Text = "Sem Sinal GPS";
-                pd1.Window.SetType(Android.Views.WindowManagerTypes.SystemAlert);
-                pd1.SetTitle("Sem Sinal GPS...");
-                pd1.Show();
-                //pd1.Wait();
-                //pd1.Dismiss();
+            //if (location == null)
+            //{
+            //    System.Diagnostics.Debug.WriteLine("Sem Sinal GPS");
 
-            }
-            else
-            {
-                // lat = Math.Round(location.Latitude, 4);
-                // lng = Math.Round(location.Longitude, 4);
-
-                lat = location.Latitude;
-                lng = location.Longitude;
-
-               // lat = Convert.ToDouble(Convert.ToString(location.Latitude).Replace(",","."));
-
-                // lng = Convert.ToDouble(Convert.ToString(location.Longitude).Replace(",", "."));
+            //    pd1.Window.SetType(Android.Views.WindowManagerTypes.SystemAlert);
+            //    pd1.SetTitle("Sem Sinal GPS...");
+            //    pd1.Show();
 
 
-                new GetWeather(this, openWeatherMap).Execute(Common.APIRequest(lat.ToString(), lng.ToString()));
-            }
+            //}
+            //else
+            //{
+
+
+            //    lat = location.Latitude;
+            //    lng = location.Longitude;
+
+            //    latt  = (Convert.ToString(location.Latitude).Replace(",", "."));
+            //    longg = (Convert.ToString(location.Longitude).Replace(",", "."));
+
+
+
+            //    new GetWeather(this, openWeatherMap).Execute(Common.APIRequest(lat.ToString(), lng.ToString()));
+
+            new GetWeather(this, openWeatherMap).Execute(Common.APIRequest(latt, longg));
+            //}
 
 
 
@@ -107,20 +107,54 @@ namespace MostrarTempo
 
         public void OnLocationChanged(Location location)
         {
-            // lat = Math.Round(location.Latitude, 4);
-            //  lng = Math.Round(location.Longitude, 4);
 
-            lat = location.Latitude;
-            lng = location.Longitude;
+            Criteria locationCriteria = new Criteria();
+            locationCriteria.Accuracy = Accuracy.Coarse;
+            locationCriteria.PowerRequirement = Power.Low;
 
-            //  lat = Convert.ToDouble(Convert.ToString(location.Latitude).Replace(",", "."));
-
-            // lng = Convert.ToDouble(Convert.ToString(location.Longitude).Replace(",", "."));
+            locationManager = (LocationManager)GetSystemService(Context.LocationService);
+            provider = locationManager.GetBestProvider(locationCriteria, false);
 
 
-            new GetWeather(this, openWeatherMap).Execute(Common.APIRequest(lat.ToString(), lng.ToString()));
 
-         
+            Location locations = locationManager.GetLastKnownLocation(provider);
+            if (locations == null)
+            {
+                System.Diagnostics.Debug.WriteLine("Sem Sinal GPS");
+
+                pd1.Window.SetType(Android.Views.WindowManagerTypes.SystemAlert);
+                pd1.SetTitle("Sem Sinal GPS...");
+                pd1.Show();
+
+
+            }
+            else
+            {
+
+
+                lat = locations.Latitude;
+                lng = locations.Longitude;
+
+                latt = (Convert.ToString(locations.Latitude).Replace(",", "."));
+                longg = (Convert.ToString(locations.Longitude).Replace(",", "."));
+
+
+
+               //  new GetWeather(this, openWeatherMap).Execute(Common.APIRequest(lat.ToString(), lng.ToString()));
+
+                new GetWeather(this, openWeatherMap).Execute(Common.APIRequest(latt, longg));
+            }
+
+            //lat = location.Latitude;
+            //lng = location.Longitude;
+
+            //latt = (Convert.ToString(location.Latitude).Replace(",", "."));
+            //longg = (Convert.ToString(location.Longitude).Replace(",", "."));
+
+
+            //new GetWeather(this, openWeatherMap).Execute(Common.APIRequest(lat.ToString(), lng.ToString()));
+
+
         }
 
         public void OnProviderDisabled(string provider)
@@ -174,17 +208,7 @@ namespace MostrarTempo
 
             }
 
-            static double Celcius(double f)
-            {
-                double c = (f - 32);
-
-                c = ( c * 5 );
-
-                c = (c/9);
-                
-                return Math.Round(c,4);
-            }
-
+            
             protected override void OnPostExecute(string result)
             {
                 base.OnPostExecute(result);
@@ -211,7 +235,10 @@ namespace MostrarTempo
                     activity.txtTime = activity.FindViewById<TextView>(Resource.Id.txtTime);
                     activity.txtCelsius = activity.FindViewById<TextView>(Resource.Id.txtCelsius);
 
-                    
+                    activity.txtlatitude = activity.FindViewById<TextView>(Resource.Id.latitude);
+                    activity.txtlongitude = activity.FindViewById<TextView>(Resource.Id.longitude);
+
+
 
                     activity.imgView = activity.FindViewById<ImageView>(Resource.Id.imageView);
 
@@ -230,7 +257,9 @@ namespace MostrarTempo
 
                     activity.txtCelsius.Text = $"{(openWeatherMap.main.temp) - 273.15} °C";
 
+                    activity.txtlatitude.Text = $"Latitude : {(lat.ToString().Replace(",", "."))}";
 
+                    activity.txtlongitude.Text = $"Logitude : {(lng.ToString().Replace(",", "."))}";
 
 
                     if (!String.IsNullOrEmpty(openWeatherMap.weather[0].icon))
